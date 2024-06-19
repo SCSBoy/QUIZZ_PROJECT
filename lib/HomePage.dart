@@ -11,8 +11,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<String> shuffledOptions = [];
-  int number = 0;
+  int currentQuestionNumber = 0;
   List responseData = [];
+  
 
   Future api() async {
     final response = await http.get(
@@ -33,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     api();
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -94,20 +95,20 @@ class _HomePageState extends State<HomePage> {
                                 )
                               ],
                             ),
-                            Center(
-                              child: Text(
-                                "question 3/10",
-                                style: TextStyle(
-                                  color: Color(0xffA42FC1),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
+                           Center(
+              child: Text(
+                "question ${currentQuestionNumber + 1}/${responseData.length}",
+                style: TextStyle(
+                  color: Color(0xffA42FC1),
+                ),
+              ),
+            ),
+SizedBox(
                               height: 25,
                             ),
                             Text(
                               responseData.isNotEmpty
-                                  ? responseData[number]['question']
+                                  ? responseData[currentQuestionNumber]['question']
                                   : '',
                             ),
                           ],
@@ -137,7 +138,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Column(
               children: (responseData.isNotEmpty &&
-                      responseData[number]['incorrect_answers'] != null)
+                      responseData[currentQuestionNumber]['incorrect_answers'] != null)
                   ? shuffledOptions.map((option) {
                       return Options(option: option.toString());
                     }).toList()
@@ -180,11 +181,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void nextQuestion() {
-    if (number == responseData.length - 1) {
+    if (currentQuestionNumber == responseData.length - 1) {
       completed();
     } else {
       setState(() {
-        number = number + 1;
+        currentQuestionNumber++;
         updateShuffledOption();
       });
     }
@@ -199,11 +200,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void updateShuffledOption() {
+   void updateShuffledOption() {
     setState(() {
       shuffledOptions = shuffledOption([
-        responseData[number]['correct_answer'],
-        ...(responseData[number]['incorrect_answers'] as List)
+        responseData[currentQuestionNumber]['correct_answer'],
+        ...(responseData[currentQuestionNumber]['incorrect_answers'] as List)
       ]);
     });
   }
